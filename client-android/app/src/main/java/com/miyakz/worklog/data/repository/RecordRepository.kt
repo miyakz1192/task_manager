@@ -5,6 +5,7 @@ import com.miyakz.worklog.data.local.RecordEntity
 import com.miyakz.worklog.util.TaskIdGenerator
 import java.time.Instant
 import java.time.LocalDate
+import java.time.LocalTime
 import java.time.ZoneId
 import kotlinx.coroutines.flow.Flow
 
@@ -15,24 +16,32 @@ import kotlinx.coroutines.flow.Flow
  */
 class RecordRepository(private val recordDao: RecordDao) {
 
-    fun observeTodayRecords(): Flow<List<RecordEntity>> {
+    fun observeRecordsForDate(date: LocalDate): Flow<List<RecordEntity>> {
         val zone = ZoneId.systemDefault()
-        val today = LocalDate.now(zone)
-        val startOfDay = today.atStartOfDay(zone).toInstant().toString()
-        val endOfDay = today.plusDays(1).atStartOfDay(zone).toInstant().toString()
+        val startOfDay = date.atStartOfDay(zone).toInstant().toString()
+        val endOfDay = date.plusDays(1).atStartOfDay(zone).toInstant().toString()
         return recordDao.observeRecordsBetween(startOfDay, endOfDay)
     }
 
-    suspend fun addRecord(text: String) {
+    /**
+     * Adds a record dated to [date] (defaults to today, but the UI lets the
+     * user pick an earlier day to log work they forgot to note at the time).
+     * The time-of-day is always "now" — only the calendar day is adjustable —
+     * so entries added in the same backfill session still sort by entry order.
+     */
+    suspend fun addRecord(text: String, date: LocalDate = LocalDate.now()) {
         val trimmed = text.trim()
         if (trimmed.isEmpty()) return
-        val now = Instant.now().toString()
+        val timestamp = date.atTime(LocalTime.now())
+            .atZone(ZoneId.systemDefault())
+            .toInstant()
+            .toString()
         recordDao.insertNew(
             RecordEntity(
                 taskId = TaskIdGenerator.generate(),
                 text = trimmed,
-                createdAt = now,
-                updatedAt = now,
+                createdAt = timestamp,
+                updatedAt = timestamp,
                 isDeleted = false,
                 dirty = true,
             )

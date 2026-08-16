@@ -27,13 +27,19 @@ async def lifespan(app: FastAPI):
     if not _MDNS_DISABLED:
         try:
             advertiser.start()
-        except OSError as exc:
-            # e.g. no usable network interface at boot time; sync still
-            # works over a direct IP, only LAN auto-discovery is degraded.
+        except Exception as exc:
+            # mDNS registration can fail for reasons that have nothing to
+            # do with the app itself (no usable interface yet at boot,
+            # the multicast port unavailable, a stale announcement from a
+            # previous crash still occupying the name, ...). Discovery is
+            # a nice-to-have; the sync API and wizard must come up
+            # regardless, so this must never abort startup.
             logging.getLogger(__name__).warning("mDNS advertisement failed to start: %s", exc)
-    yield
-    if not _MDNS_DISABLED:
-        advertiser.stop()
+    try:
+        yield
+    finally:
+        if not _MDNS_DISABLED:
+            advertiser.stop()
 
 
 app = FastAPI(title="work-log-app server", lifespan=lifespan)

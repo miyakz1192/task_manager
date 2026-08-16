@@ -1,3 +1,6 @@
+import java.text.SimpleDateFormat
+import java.util.Date
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
@@ -16,6 +19,11 @@ android {
         targetSdk = 35
         versionCode = 1
         versionName = "1.0"
+
+        // Distinct from versionCode/versionName (which only change on
+        // deliberate releases): a per-build stamp so a sideloaded debug
+        // APK can be visibly confirmed as "the one just installed".
+        buildConfigField("String", "BUILD_TIME", "\"${buildTimeString()}\"")
     }
 
     buildTypes {
@@ -35,8 +43,12 @@ android {
 
     buildFeatures {
         compose = true
+        buildConfig = true
     }
 }
+
+fun buildTimeString(): String =
+    SimpleDateFormat("yyyy-MM-dd HH:mm").format(Date())
 
 dependencies {
     implementation(libs.androidx.core.ktx)

@@ -40,7 +40,19 @@ class ServerAdvertiser:
             properties={},
         )
         self._zeroconf = Zeroconf()
-        self._zeroconf.register_service(self._info)
+        try:
+            # allow_name_change: if a previous crash left a stale
+            # announcement of this same name on the network (its TTL not
+            # yet expired), auto-rename instead of raising
+            # NonUniqueNameException. The Android client matches on
+            # service *type*, not the exact instance name, so a renamed
+            # instance is still discoverable.
+            self._zeroconf.register_service(self._info, allow_name_change=True)
+        except Exception:
+            self._zeroconf.close()
+            self._zeroconf = None
+            self._info = None
+            raise
         logger.info("mDNS advertised: %s at %s:%s", ZEROCONF_SERVICE_NAME, ip, PORT)
 
     def stop(self) -> None:

@@ -10,8 +10,12 @@ import com.miyakz.worklog.WorkLogApp
 import com.miyakz.worklog.data.local.RecordEntity
 import com.miyakz.worklog.data.repository.RecordRepository
 import com.miyakz.worklog.data.repository.SyncRepository
+import java.time.LocalDate
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
@@ -20,7 +24,12 @@ class TodayViewModel(
     private val syncRepository: SyncRepository,
 ) : ViewModel() {
 
-    val todayRecords: StateFlow<List<RecordEntity>> = recordRepository.observeTodayRecords()
+    private val _selectedDate = MutableStateFlow(LocalDate.now())
+    val selectedDate: StateFlow<LocalDate> = _selectedDate.asStateFlow()
+
+    @OptIn(kotlinx.coroutines.ExperimentalCoroutinesApi::class)
+    val records: StateFlow<List<RecordEntity>> = _selectedDate
+        .flatMapLatest { date -> recordRepository.observeRecordsForDate(date) }
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
 
     var inputText by mutableStateOf("")
@@ -52,8 +61,9 @@ class TodayViewModel(
     fun addRecord() {
         val text = inputText
         if (text.isBlank()) return
+        val date = _selectedDate.value
         viewModelScope.launch {
-            recordRepository.addRecord(text)
+            recordRepository.addRecord(text, date)
             inputText = ""
             suggestions = emptyList()
         }
@@ -61,6 +71,23 @@ class TodayViewModel(
 
     fun deleteRecord(taskId: String) {
         viewModelScope.launch { recordRepository.deleteRecord(taskId) }
+    }
+
+    fun goToPreviousDay() {
+        _selectedDate.value = _selectedDate.value.minusDays(1)
+    }
+
+    fun goToNextDay() {
+        val next = _selectedDate.value.plusDays(1)
+        if (!next.isAfter(LocalDate.now())) {
+            _selectedDate.value = next
+        }
+    }
+
+    fun goToDate(date: LocalDate) {
+        if (!date.isAfter(LocalDate.now())) {
+            _selectedDate.value = date
+        }
     }
 
     fun syncManually() {
