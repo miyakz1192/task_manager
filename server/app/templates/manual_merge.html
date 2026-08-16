@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% block title %}手動統合{% endblock %}
+{% block content %}
+<h1>一覧からの手動統合</h1>
+<p class="muted">タスク名を頻度付きで一覧表示します。統合したいものを複数選択し、統合先の名称を指定してください。</p>
+
+{% if message %}<p class="message">{{ message }}</p>{% endif %}
+
+<form method="post" action="/merge/manual/confirm">
+  <table>
+    <thead><tr><th></th><th>表記</th><th>件数</th></tr></thead>
+    <tbody>
+    {% for t in tasks %}
+      <tr>
+        <td><input type="checkbox" name="selected_texts" value="{{ t.text }}"></td>
+        <td>{{ t.text }}</td>
+        <td>{{ t.count }}</td>
+      </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+
+  <h2>統合先の正式名称</h2>
+  <p>
+    <label><input type="radio" name="target_mode" value="existing" checked> 既存候補から選ぶ</label>
+    <select name="existing_target">
+      {% for t in tasks %}
+      <option value="{{ t.text }}">{{ t.text }}</option>
+      {% endfor %}
+    </select>
+  </p>
+  <p>
+    <label><input type="radio" name="target_mode" value="new"> 新規に入力する</label>
+    <input type="text" name="new_target" placeholder="新しい正式名称">
+  </p>
+
+  <button type="submit">選択したタスクを統合する</button>
+</form>
+{% endblock %}

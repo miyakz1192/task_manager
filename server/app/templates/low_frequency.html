@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block title %}低頻度レビュー{% endblock %}
+{% block content %}
+<h1>低頻度タスクのレビュー</h1>
+<p class="muted">出現回数が少ない順に並べています。表記ゆれの見落としがないか確認してください。統合するには<a href="/merge/manual">手動統合</a>ページを使ってください。</p>
+<table>
+  <thead><tr><th>表記</th><th>件数</th></tr></thead>
+  <tbody>
+  {% for t in tasks %}
+    <tr><td>{{ t.text }}</td><td>{{ t.count }}</td></tr>
+  {% endfor %}
+  </tbody>
+</table>
+{% endblock %}

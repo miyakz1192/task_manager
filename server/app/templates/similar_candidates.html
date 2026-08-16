@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block title %}類似候補統合{% endblock %}
+{% block content %}
+<h1>類似候補の統合</h1>
+<p class="muted">rapidfuzzの編集距離ベーススコア(0〜100)を正規化後の文字列に適用しています。スコア降順で表示します。</p>
+
+<form method="get" action="/merge/similar" class="card">
+  <label>しきい値:
+    <input type="number" name="threshold" value="{{ threshold }}" min="0" max="100">
+  </label>
+  <button type="submit">再検索</button>
+</form>
+
+{% include "partials/similar_candidates_list.html" %}
+{% endblock %}

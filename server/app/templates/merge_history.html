@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% block title %}統合履歴{% endblock %}
+{% block content %}
+<h1>統合履歴</h1>
+{% if not history %}
+  <p class="empty">統合履歴はまだありません。</p>
+{% else %}
+<table>
+  <thead><tr><th>日時</th><th>統合元</th><th>統合先</th><th>件数</th></tr></thead>
+  <tbody>
+  {% for h in history %}
+    <tr>
+      <td>{{ h.merged_at }}</td>
+      <td>{{ h.from_text }}</td>
+      <td>{{ h.to_text }}</td>
+      <td>{{ h.affected_count }}</td>
+    </tr>
+  {% endfor %}
+  </tbody>
+</table>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% block title %}トップ{% endblock %}
+{% block content %}
+<h1>作業記録アプリ - 統合ウィザード</h1>
+<p class="muted">表記ゆれのあるタスク名を確認しながら正式名称に統一します。</p>
+
+<div class="card">
+  <a href="/merge/exact">表記ゆれ(完全一致相当)の統合</a>
+  <p class="muted">全角半角統一・トリムなどで一致するグループ: <span class="count">{{ exact_count }}</span> 件</p>
+</div>
+
+<div class="card">
+  <a href="/merge/similar">類似候補の統合</a>
+  <p class="muted">rapidfuzzスコア80以上のペア: <span class="count">{{ similar_count }}</span> 件</p>
+</div>
+
+<div class="card">
+  <a href="/merge/manual">一覧からの手動統合</a>
+  <p class="muted">現在のタスク名の種類: <span class="count">{{ task_count }}</span> 件</p>
+</div>
+
+<div class="card">
+  <a href="/merge/low-frequency">低頻度タスクのレビュー</a>
+  <p class="muted">出現回数が少ない順に並べ、統合対象の発見を補助します。</p>
+</div>
+
+<div class="card">
+  <a href="/merge/history">統合履歴</a>
+  <p class="muted">これまでの統合操作: <span class="count">{{ history_count }}</span> 件</p>
+</div>
+{% endblock %}

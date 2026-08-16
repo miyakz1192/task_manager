@@ -1,0 +1,28 @@
+<div id="exact-groups">
+{% if not groups %}
+  <p class="empty">表記ゆれグループはありません。</p>
+{% else %}
+  {% for group in groups %}
+  <form class="card" hx-post="/merge/exact/confirm" hx-target="#exact-groups" hx-swap="outerHTML">
+    <div class="muted">正規化後: <code>{{ group.normalized }}</code> / 合計 {{ group.total_count }} 件</div>
+    <table>
+      <thead><tr><th></th><th>表記</th><th>件数</th></tr></thead>
+      <tbody>
+      {% for variant in group.variants %}
+        <tr>
+          <td>
+            <input type="radio" name="target_text" value="{{ variant.text }}"
+                   {% if loop.first %}checked{% endif %}>
+          </td>
+          <td>{{ variant.text }}</td>
+          <td>{{ variant.count }}</td>
+        </tr>
+        <input type="hidden" name="variant_texts" value="{{ variant.text }}">
+      {% endfor %}
+      </tbody>
+    </table>
+    <button type="submit">選択した表記に統合する</button>
+  </form>
+  {% endfor %}
+{% endif %}
+</div>

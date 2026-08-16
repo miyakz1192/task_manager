@@ -1,0 +1,7 @@
+{% extends "base.html" %}
+{% block title %}表記ゆれ統合{% endblock %}
+{% block content %}
+<h1>表記ゆれ(完全一致相当)の統合</h1>
+<p class="muted">NFKC正規化・トリム・空白圧縮の結果が完全一致するタスク名をグループ化しています。統合先の表記を選んでワンクリックで確認してください(自動統合はしません)。</p>
+{% include "partials/exact_groups_list.html" %}
+{% endblock %}

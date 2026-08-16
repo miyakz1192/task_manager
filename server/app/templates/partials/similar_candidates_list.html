@@ -1,0 +1,36 @@
+<div id="similar-candidates">
+{% if not candidates %}
+  <p class="empty">スコア{{ threshold }}以上の類似候補はありません。</p>
+{% else %}
+  {% for c in candidates %}
+  <form class="card" hx-post="/merge/similar/confirm" hx-target="#similar-candidates" hx-swap="outerHTML">
+    <input type="hidden" name="text_a" value="{{ c.text_a }}">
+    <input type="hidden" name="text_b" value="{{ c.text_b }}">
+    <input type="hidden" name="threshold" value="{{ threshold }}">
+    <span class="score-badge">score {{ c.score }}</span>
+    <table>
+      <tbody>
+        <tr>
+          <td><input type="radio" name="target_choice" value="a" checked></td>
+          <td>{{ c.text_a }}</td>
+          <td class="muted">{{ c.count_a }} 件</td>
+        </tr>
+        <tr>
+          <td><input type="radio" name="target_choice" value="b"></td>
+          <td>{{ c.text_b }}</td>
+          <td class="muted">{{ c.count_b }} 件</td>
+        </tr>
+        <tr>
+          <td><input type="radio" name="target_choice" value="custom"></td>
+          <td colspan="2">
+            <input type="text" name="target_text_custom" placeholder="新しい正式名称を入力">
+          </td>
+        </tr>
+      </tbody>
+    </table>
+    <button type="submit">統合する</button>
+    <button type="button" class="secondary" onclick="this.closest('form').remove()">この候補は統合しない</button>
+  </form>
+  {% endfor %}
+{% endif %}
+</div>
