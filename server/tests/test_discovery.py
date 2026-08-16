@@ -23,20 +23,20 @@ def client_with_mdns_registration_failure(tmp_path, monkeypatch):
     from app.db import init_db
     import app.discovery as discovery_module
 
-    class ExplodingZeroconf:
+    class ExplodingAsyncZeroconf:
         def __init__(self, *args, **kwargs):
             pass
 
-        def register_service(self, *args, **kwargs):
+        async def async_register_service(self, *args, **kwargs):
             raise RuntimeError("simulated NonUniqueNameException")
 
-        def unregister_service(self, *args, **kwargs):
+        async def async_unregister_service(self, *args, **kwargs):
             pass
 
-        def close(self):
+        async def async_close(self):
             pass
 
-    monkeypatch.setattr(discovery_module, "Zeroconf", ExplodingZeroconf)
+    monkeypatch.setattr(discovery_module, "AsyncZeroconf", ExplodingAsyncZeroconf)
 
     import app.main as main_module
 

@@ -26,7 +26,7 @@ async def lifespan(app: FastAPI):
     init_db()
     if not _MDNS_DISABLED:
         try:
-            advertiser.start()
+            await advertiser.start()
         except Exception as exc:
             # mDNS registration can fail for reasons that have nothing to
             # do with the app itself (no usable interface yet at boot,
@@ -39,7 +39,7 @@ async def lifespan(app: FastAPI):
         yield
     finally:
         if not _MDNS_DISABLED:
-            advertiser.stop()
+            await advertiser.stop()
 
 
 app = FastAPI(title="work-log-app server", lifespan=lifespan)
